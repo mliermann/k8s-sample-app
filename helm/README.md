@@ -16,6 +16,12 @@ kubectl create secret generic db-secret \
   --from-literal=DB_USER=sampleuser \
   --from-literal=DB_PASS=samplepass
 ```
+- Create a TLS secret `frontend-tls` in your target namespace as follows:
+```sh
+kubectl create secret tls frontend-tls \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+```
 
 Package and push charts to your OCI registry, then deploy:
 

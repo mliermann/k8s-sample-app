@@ -86,11 +86,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm upgrade --install postgres bitnami/postgresql \
             --namespace ${{ github.event.inputs.namespace || 'default' }} \
-            --set architecture=replication \
-            --set replicaCount=3 \
-            --set auth.username=${{ github.event.inputs.db_user }} \
-            --set auth.password=${{ github.event.inputs.db_pass }} \
-            --set auth.database=sampledb
+            -f helm/values-postgres.yaml
 
       - name: Verify frontend deployment
         run: |

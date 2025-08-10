@@ -49,6 +49,12 @@ kubectl create secret generic db-secret \
   --from-literal=DB_USER=sampleuser \
   --from-literal=DB_PASS=samplepass
 ```
+- TLS secret `frontend-tls` created in target namespace as follows:
+```sh
+kubectl create secret tls frontend-tls \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+```
 
 **Deploy:**
 ```sh
@@ -68,6 +74,12 @@ kubectl create secret generic db-secret \
   --from-literal=DB_USER=sampleuser \
   --from-literal=DB_PASS=samplepass
 ```
+- TLS secret `frontend-tls` created in target namespace as follows:
+```sh
+kubectl create secret tls frontend-tls \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+```
 
 **Deploy:**
 ```sh
@@ -77,13 +89,7 @@ helm upgrade --install frontend oci://<oci-registry>/frontend --version 0.1.0 --
 helm upgrade --install backend oci://<oci-registry>/backend --version 0.1.0 --namespace <namespace>
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm upgrade --install postgres bitnami/postgresql \
-  --namespace <namespace> \
-  --set architecture=replication \
-  --set replicaCount=3 \
-  --set auth.username=sampleuser \
-  --set auth.password=samplepass \
-  --set auth.database=sampledb
+helm upgrade --install postgres bitnami/postgresql --namespace <namespace> -f helm/values-postgresql.yaml
 ```
 
 ### 3. FluxCD GitOps
