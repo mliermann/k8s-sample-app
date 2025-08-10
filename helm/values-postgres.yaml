@@ -1,0 +1,25 @@
+architecture: replication
+replicaCount: 3
+
+auth:
+  existingSecret: postgres-secret
+  secretKeys:
+    user: DB_USER
+    password: DB_PASS
+    database: DB_NAME
+
+primary:
+  persistence:
+    size: 10Gi
+
+readReplicas:
+  persistence:
+    size: 10Gi
+
+# uncomment the below to create a service monitor for Prometheus
+# metrics:
+#   enabled: true
+#   serviceMonitor:
+#     enabled: true
+#     interval: 30s
+#     scrapeTimeout: 10s

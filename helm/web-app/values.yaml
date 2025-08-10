@@ -1,0 +1,20 @@
+replicaCount: 3
+image:
+  repository: backend
+  tag: latest
+config:
+  DATABASE_HOST: "postgres"
+  DATABASE_USER: "sampleuser"
+  DATABASE_PASSWORD: "samplepass"
+  ENV_VARS:
+    - DEBUG=true
+    - LOG_LEVEL=info
+service:
+  port: 8000
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"

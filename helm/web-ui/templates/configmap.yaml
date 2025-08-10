@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  APP_TITLE: {{ .Values.config.APP_TITLE | quote }}
+  FEATURE_FLAGS: {{ join "," .Values.config.FEATURE_FLAGS | quote }}

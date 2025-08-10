@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  DATABASE_HOST: {{ .Values.config.DATABASE_HOST | quote }}
+  DATABASE_USER: {{ .Values.config.DATABASE_USER | quote }}
+  DATABASE_PASSWORD: {{ .Values.config.DATABASE_PASSWORD | quote }}
+  ENV_VARS: {{ join "," .Values.config.ENV_VARS | quote }}

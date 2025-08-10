@@ -1,0 +1,73 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: "Kubernetes namespace to deploy to"
+        required: true
+        default: "default"
+      db_user:
+        description: "Database user"
+        required: true
+        default: "sampleuser"
+      db_pass:
+        description: "Database password"
+        required: true
+        default: "samplepass"
+      db_name:
+        description: "Database name"
+        required: true
+        default: "sampledb"
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
+
+      - name: Set up Kubeconfig
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          echo "$KUBE_CONFIG_DATA" > $HOME/.kube/config
+
+      - name: Ensure namespace exists
+        run: |
+          kubectl get namespace ${{ github.event.inputs.namespace || 'default' }} || \
+          kubectl create namespace ${{ github.event.inputs.namespace || 'default' }}
+
+      - name: Create db-secret
+        run: |
+          kubectl create secret generic db-secret \
+            --from-literal=DB_USER=${{ github.event.inputs.db_user }} \
+            --from-literal=DB_PASS=${{ github.event.inputs.db_pass }} \
+            --from-literal=DB_NAME=${{ github.event.inputs.db_name }} \
+            -n ${{ github.event.inputs.namespace || 'default' }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy manifests
+        run: |
+          kubectl apply -n ${{ github.event.inputs.namespace || 'default' }} -k kubernetes/
+
+      - name: Verify frontend deployment
+        run: |
+          kubectl rollout status deployment/frontend -n ${{ github.event.inputs.namespace || 'default' }} --timeout=120s
+
+      - name: Verify backend deployment
+        run: |
+          kubectl rollout status deployment/backend -n ${{ github.event.inputs.namespace || 'default' }} --timeout=120s
+
+      - name: Verify postgres statefulset
+        run: |
+          kubectl rollout status statefulset/postgres -n ${{ github.event.inputs.namespace || 'default' }} --timeout=
